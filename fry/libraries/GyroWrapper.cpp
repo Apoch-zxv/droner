@@ -4,8 +4,10 @@
 
 #include "GyroWrapper.h"
 
+volatile bool QGyroWrapper::MPU_INTERRUPT = false;
+
 void dmpDataReady() {
-    MPU_INTERRUPT = true;
+    QGyroWrapper::MPU_INTERRUPT = true;
 }
 
 uint16_t QGyroWrapper::initialize() {

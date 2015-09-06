@@ -13,14 +13,15 @@
 
 enum InitializationStatus {MPU_INIT_STATUS_SUCCESS = 0x10, MPU_INIT_STATUS_MPU_ERROR = 0x20, MPU_INIT_STATUS_DNP_ERROR = 0x40};
 
-volatile bool MPU_INTERRUPT = false;
-
 class QGyroWrapper {
 private:
     MPU6050 mpu;
     uint16_t packetSize;
     uint8_t fifoBuffer[FIFO_BUFFER_SIZE];
 public:
+    static volatile bool MPU_INTERRUPT;
+
+
     uint16_t initialize();
     inline const uint16_t& getPacketSize() const { return packetSize; }
     inline volatile bool& getMpuInterrupt() { return MPU_INTERRUPT; }
