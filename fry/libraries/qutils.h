@@ -7,7 +7,9 @@
 
 typedef unsigned char prog_uchar;
 
-#ifdef DEBUG
+#define QDEBUG
+
+#ifdef QDEBUG
     #define QDEBUG(x) Serial.print(x)
     #define QDEBUG_BASE(x, y) Serial.print(x, y)
     #define QDEBUG_BASELN(x) Serial.println(x)

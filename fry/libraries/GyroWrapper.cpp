@@ -10,6 +10,28 @@ void dmpDataReady() {
     QGyroWrapper::MPU_INTERRUPT = true;
 }
 
+void QGyroWrapper::loadLatestMeasurements() {
+    QGyroWrapper::MPU_INTERRUPT = false;
+    lastInterruptState = mpu.getIntStatus();
+    uint16_t fifoCount = mpu.getFIFOCount();
+
+    if((lastInterruptState & 0x10) || fifoCount >= 1024){
+        //QDEBUG_BASELN("Fifo overflow");
+        mpu.resetFIFO();
+    }else if(lastInterruptState & 0x02){
+        while (fifoCount < packetSize) fifoCount = mpu.getFIFOCount();
+        //QDEBUG_BASELN("Acctually loaded");
+
+        mpu.getFIFOBytes(fifoBuffer, packetSize);
+
+        fifoCount -= packetSize;
+
+        mpu.dmpGetQuaternion(&currentQuaternion, fifoBuffer);
+        mpu.dmpGetGravity(&currentGravity, &currentQuaternion);
+        mpu.dmpGetYawPitchRoll(currentYPR, &currentQuaternion, &currentGravity);
+    }
+}
+
 uint16_t QGyroWrapper::initialize() {
     QDEBUG_BASELN("Initializeing mpu");
     mpu.initialize();
