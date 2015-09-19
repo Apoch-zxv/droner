@@ -10,6 +10,7 @@
 #include "PIDProcess.h"
 
 QGyroWrapper gyro;
+MotorController motorController;
 PIDProcess yawPidProcess(0, )
 
 bool initMpu() {
@@ -39,7 +40,7 @@ bool initMpu() {
 }
 
 bool initMotorController() {
-    // TODO
+    motorController.init();
     return true;
 }
 
