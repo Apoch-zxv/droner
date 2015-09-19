@@ -10,16 +10,24 @@ void dmpDataReady() {
     QGyroWrapper::MPU_INTERRUPT = true;
 }
 
-void QGyroWrapper::loadLatestMeasurements() {
+bool QGyroWrapper::loadLatestMeasurements() {
+    if (!QGyroWrapper::MPU_INTERRUPT) {
+        return false;
+    }
+
     QGyroWrapper::MPU_INTERRUPT = false;
     lastInterruptState = mpu.getIntStatus();
     uint16_t fifoCount = mpu.getFIFOCount();
 
-    if((lastInterruptState & 0x10) || fifoCount >= 1024){
-        //QDEBUG_BASELN("Fifo overflow");
+    if((lastInterruptState & 0x10) || fifoCount == 1024){
+        QDEBUG_BASELN("Reseting fifo");
         mpu.resetFIFO();
+        return false;
     }else if(lastInterruptState & 0x02){
-        while (fifoCount < packetSize) fifoCount = mpu.getFIFOCount();
+        while (fifoCount < packetSize) {
+            fifoCount = mpu.getFIFOCount();
+        }
+
         //QDEBUG_BASELN("Acctually loaded");
 
         mpu.getFIFOBytes(fifoBuffer, packetSize);
@@ -29,7 +37,10 @@ void QGyroWrapper::loadLatestMeasurements() {
         mpu.dmpGetQuaternion(&currentQuaternion, fifoBuffer);
         mpu.dmpGetGravity(&currentGravity, &currentQuaternion);
         mpu.dmpGetYawPitchRoll(currentYPR, &currentQuaternion, &currentGravity);
+        return true;
     }
+
+    return false;
 }
 
 uint16_t QGyroWrapper::initialize() {
@@ -51,6 +62,12 @@ uint16_t QGyroWrapper::initialize() {
 
     QDEBUG_BASELN("Initializing DNP");
     uint8_t dev_status = mpu.dmpInitialize();
+
+    // Its from the tutorial not sure what it does
+//    mpu.setXGyroOffset(220);
+//    mpu.setYGyroOffset(76);
+//    mpu.setZGyroOffset(-85);
+//    mpu.setZAccelOffset(1788); // 1688 factory default for my test chip
 
     if (dev_status == 0) {
         QDEBUG_BASELN("Successfully initialized enabling");

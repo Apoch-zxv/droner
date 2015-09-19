@@ -33,13 +33,15 @@ public:
     static volatile bool MPU_INTERRUPT;
 
     uint16_t initialize();
-    void loadLatestMeasurements();
+    bool loadLatestMeasurements();
     inline const uint16_t& getPacketSize() const { return packetSize; }
     inline volatile bool& getMpuInterrupt() { return MPU_INTERRUPT; }
 
     inline const float& getCurrentYaw() const { return currentYPR[YAW_INDEX]; }
     inline const float& getCurrentPitch() const { return currentYPR[PITCH_INDEX]; }
     inline const float& getCurrentRoll() const { return currentYPR[ROLL_INDEX]; }
+
+    inline uint8_t* getFifoBuffer() { return fifoBuffer; }
 };
 
 
