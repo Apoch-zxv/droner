@@ -1,13 +1,12 @@
 set(PROJECT_NAME fry)
 
-set(CMAKE_ARDUINO_PATH /home/grg/arduino-cmake-master)
+set(CMAKE_ARDUINO_PATH ~/arduino-cmake-master)
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_ARDUINO_PATH}/cmake/ArduinoToolchain.cmake) # Arduino Toolchain
 set(CMAKE_EXTERNAL_LIBS_PATH ~/sketchbook/libraries) # arduino external libs
-set(CMAKE_DEP_LIBS_PATH ${CMAKE_CURRENT_SOURCE_DIR}/libraries) # arduino external libs
+
 
 # Link external libs directories (as Arduino-IDE uses it)
 link_directories(${CMAKE_EXTERNAL_LIBS_PATH})
-link_directories(${CMAKE_DEP_LIBS_PATH})
 
 cmake_minimum_required(VERSION 2.8)
 
@@ -19,7 +18,7 @@ project(${PROJECT_NAME} C CXX)
 set(${PROJECT_NAME}_BOARD uno)
 
 # Define the source code
-set(${PROJECT_NAME}_SRCS qcopter.cpp)
+set(${PROJECT_NAME}_SRCS qcopter.cpp external_libraries/I2Cdev.cpp external_libraries/MPU6050.cpp GyroWrapper.cpp MotorController.cpp PIDProcess.cpp)
 
 # Define the port for uploading code to the Arduino
 set(${PROJECT_NAME}_PORT /dev/ttyUSB1)

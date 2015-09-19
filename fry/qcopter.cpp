@@ -5,13 +5,16 @@
 #endif
 
 #include "qutils.h"
-#include "I2Cdev.h"
+#include "external_libraries/I2Cdev.h"
 #include "GyroWrapper.h"
 #include "PIDProcess.h"
+#include "MotorController.h"
 
 QGyroWrapper gyro;
-MotorController motorController;
-PIDProcess yawPidProcess(0, )
+MotorController motorController(8, 9, 10, 11);
+PIDProcess yawPidProcess(0, 0, 1, 0, NORMAL);
+PIDProcess rollPidProcess(0, 0, 1, 0, NORMAL);
+PIDProcess pitchPidProcess(0, 0, 1, 0, NORMAL);
 
 bool initMpu() {
     #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
@@ -67,6 +70,11 @@ int count = 0;
 
 void loop() {
     gyro.loadLatestMeasurements();
+    yawPidProcess.compute(gyro.getCurrentYaw());
+    rollPidProcess.compute(gyro.getCurrentRoll());
+    pitchPidProcess.compute(gyro.getCurrentPitch());
+    motorController.updateSpeed(yawPidProcess.getNextAction(), pitchPidProcess.getNextAction(),
+                                rollPidProcess.getNextAction());
 
     if (count % 1000 == 0) {
         Serial.println(gyro.getCurrentYaw());

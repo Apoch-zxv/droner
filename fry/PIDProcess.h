@@ -9,6 +9,8 @@ enum ControllerDirections {NORMAL, REVERSE};
 
 class PIDProcess {
 private:
+    static const unsigned long DEFAULT_SAMPLE_TIME;
+
     float desiredValue;
     float lastValue;
     float ki, kd, kp;
@@ -20,7 +22,7 @@ private:
 
 public:
     PIDProcess(float desiredValue, float ki, float kd, float kp,
-               ControllerDirections controllerDirection, float outMin = 0, float outMax = 255);
+               ControllerDirections controllerDirection, float outMin = 0., float outMax = 255.);
     bool compute(const float& currentValue);
 
     void setTunings(float kp, float ki, float kd);

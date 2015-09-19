@@ -7,7 +7,7 @@
 
 #include "qutils.h"
 #include "Arduino.h"
-#include "MPU6050_6Axis_MotionApps20.h"
+#include "external_libraries/MPU6050_6Axis_MotionApps20.h"
 
 #define FIFO_BUFFER_SIZE 64
 

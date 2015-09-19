@@ -4,17 +4,20 @@
 
 #include "PIDProcess.h"
 
+#include "Arduino.h"
+
+const unsigned long PIDProcess::DEFAULT_SAMPLE_TIME = 100;
 
 PIDProcess::PIDProcess(float desiredValue, float ki, float kd, float kp,
-                       ControllerDirections controllerDirection, float outMin = 0, float outMax = 255)
+                       ControllerDirections controllerDirection, float outMin, float outMax)
         :desiredValue(desiredValue), outMin(outMin), outMax(outMax),
          controllerDirection(controllerDirection), sampleTime(DEFAULT_SAMPLE_TIME), ITerm(0) {
-    setTunnings(kp, ki, kd);
+    setTunings(kp, ki, kd);
 
     this->lastExecMillis = millis() - this->sampleTime;
 }
 
-const float& PIDProcess::compute(const float& currentValue) {
+bool PIDProcess::compute(const float& currentValue) {
     unsigned long now = millis();
     unsigned long timeDiff = (now - lastExecMillis);
 
@@ -29,7 +32,7 @@ const float& PIDProcess::compute(const float& currentValue) {
         else if(ITerm < outMin) {
             ITerm= outMin;
         }
-        float dInput = (currentValue - lastInput);
+        float dInput = (currentValue - lastValue);
 
         /*Compute PID Output*/
         float output = kp * error + ITerm- kd * dInput;
@@ -52,7 +55,7 @@ const float& PIDProcess::compute(const float& currentValue) {
     }
 }
 
-void PID::setTunings(float kp, float ki, float kd) {
+void PIDProcess::setTunings(float kp, float ki, float kd) {
     float sampleTimeSec = ((float)sampleTime)/1000;
     this->kp = kp;
     this->ki = ki * sampleTimeSec;
