@@ -21,7 +21,7 @@ set(${PROJECT_NAME}_BOARD uno)
 set(${PROJECT_NAME}_SRCS qcopter.cpp external_libraries/I2Cdev.cpp external_libraries/MPU6050.cpp GyroWrapper.cpp MotorController.cpp PIDProcess.cpp)
 
 # Define the port for uploading code to the Arduino
-set(${PROJECT_NAME}_PORT /dev/ttyUSB1)
+set(${PROJECT_NAME}_PORT /dev/ttyUSB0)
 
 # Command to generate code arduino firmware (.hex file)
 generate_arduino_firmware(${PROJECT_NAME})
