@@ -11,12 +11,15 @@
 #include "MotorController.h"
 
 QGyroWrapper gyro;
-MotorController motorController(8, 9, 10, 11);
+MotorController motorController(10, 11, 12, 13, 1200);
 PIDProcess yawPidProcess(0, 0, 1, 0, NORMAL);
 PIDProcess rollPidProcess(0, 0, 1, 0, NORMAL);
 PIDProcess pitchPidProcess(0, 0, 1, 0, NORMAL);
+unsigned long time = millis();
+bool isPrintedStopping = false;
+bool isFirstCycle = true;
 
-#ifdef QDEBUG
+#ifdef DISPLAY
 uint8_t teapotPacket[14] = { '$', 0x02, 0,0, 0,0, 0,0, 0,0, 0x00, 0x00, '\r', '\n' };
 #endif
 
@@ -61,43 +64,68 @@ bool initMainBoardConnection() {
 
 void setup() {
     if (!initMpu()) {
+        QDEBUG_BASELN("Failed initiating the MPU");
         return;
     }
 
     if (!initMotorController()) {
+        QDEBUG_BASELN("Failed initiating the motor controller");
         return;
     }
 
     if (!initMainBoardConnection()) {
+        QDEBUG_BASELN("Failed initiating the main board");
         return;
     }
 
-    pinMode(LED_PIN, OUTPUT);
+    QDEBUG_BASELN("Initialization completed successfully");
 }
 
 void loop() {
-    //yawPidProcess.compute(gyro.getCurrentYaw());
-    //rollPidProcess.compute(gyro.getCurrentRoll());
-    //pitchPidProcess.compute(gyro.getCurrentPitch());
-    //motorController.updateSpeed(yawPidProcess.getNextAction(), pitchPidProcess.getNextAction(),
-    //                            rollPidProcess.getNextAction());
-
-    if (gyro.loadLatestMeasurements()) {
-#ifdef QDEBUG
-        uint8_t * fifoBuffer = gyro.getFifoBuffer();
-        teapotPacket[2] = fifoBuffer[0];
-        teapotPacket[3] = fifoBuffer[1];
-        teapotPacket[4] = fifoBuffer[4];
-        teapotPacket[5] = fifoBuffer[5];
-        teapotPacket[6] = fifoBuffer[8];
-        teapotPacket[7] = fifoBuffer[9];
-        teapotPacket[8] = fifoBuffer[12];
-        teapotPacket[9] = fifoBuffer[13];
-        Serial.write(teapotPacket, 14);
-        teapotPacket[11]++; // packetCount, loops at 0xFF on purpose
-
-        blinkState = !blinkState;
-        digitalWrite(LED_PIN, blinkState);
-#endif
+    if (millis() - time > 15000) {
+        if (!isPrintedStopping) {
+            QDEBUG_BASELN("Stopping");
+            isPrintedStopping = true;
+        }
+        motorController.forceStop();
+        return;
     }
+
+    /*gyro.loadLatestMeasurements();
+
+    if (isFirstCycle) {
+        // The gyro scope will not be exactly flat so we remember the first values it received
+        yawPidProcess.normalDesiredValue(gyro.getCurrentYaw());
+        rollPidProcess.normalDesiredValue(gyro.getCurrentRoll());
+        pitchPidProcess.normalDesiredValue(gyro.getCurrentPitch());
+        isFirstCycle = false;
+    } else {
+        yawPidProcess.compute(gyro.getCurrentYaw());
+        rollPidProcess.compute(gyro.getCurrentRoll());
+        pitchPidProcess.compute(gyro.getCurrentPitch());
+        motorController.updateSpeed(yawPidProcess.getNextAction(), pitchPidProcess.getNextAction(),
+                                    rollPidProcess.getNextAction(), 0);
+    }*/
+    motorController.updateSpeed(0, 0, 0, 0);
 }
+
+#ifdef DISPLAY
+void print_displayable() {
+
+    uint8_t * fifoBuffer = gyro.getFifoBuffer();
+    teapotPacket[2] = fifoBuffer[0];
+    teapotPacket[3] = fifoBuffer[1];
+    teapotPacket[4] = fifoBuffer[4];
+    teapotPacket[5] = fifoBuffer[5];
+    teapotPacket[6] = fifoBuffer[8];
+    teapotPacket[7] = fifoBuffer[9];
+    teapotPacket[8] = fifoBuffer[12];
+    teapotPacket[9] = fifoBuffer[13];
+    Serial.write(teapotPacket, 14);
+    teapotPacket[11]++; // packetCount, loops at 0xFF on purpose
+
+    blinkState = !blinkState;
+    digitalWrite(LED_PIN, blinkState);
+
+}
+#endif

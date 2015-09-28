@@ -22,8 +22,10 @@ private:
 
 public:
     PIDProcess(float desiredValue, float ki, float kd, float kp,
-               ControllerDirections controllerDirection, float outMin = 0., float outMax = 255.);
+               ControllerDirections controllerDirection, float outMin = -100., float outMax = 100.);
     bool compute(const float& currentValue);
+
+    inline void normalDesiredValue(const float& currentValue) { desiredValue += currentValue; };
 
     void setTunings(float kp, float ki, float kd);
     const float& getNextAction() const { return nextAction; }
