@@ -7,7 +7,7 @@
 
 #include "qutils.h"
 #include "Arduino.h"
-#include <Servo.h>
+#include <Servo/Servo.h>
 
 class MotorController {
 private:
@@ -21,10 +21,10 @@ private:
     unsigned int c;
     unsigned int d;
 
-    unsigned int athrottle;
-    unsigned int bthrottle;
-    unsigned int cthrottle;
-    unsigned int dthrottle;
+    float athrottle;
+    float bthrottle;
+    float cthrottle;
+    float dthrottle;
 
     Servo aserv;
     Servo bserv;
@@ -35,7 +35,7 @@ private:
 
     void setThrottle();
 
-    void validateInRange(unsigned int* value);
+    void validateInRange(float* value);
 
 public:
     inline MotorController(unsigned int a, unsigned int b, unsigned int c, unsigned int d, unsigned int minimal_speed)
@@ -44,6 +44,8 @@ public:
     void init();
 
     void forceStop();
+
+    void printThrottle();
 
     void updateSpeed(const float& yawAction, const float& pitchAction, const float& rollAction, unsigned int total_speed);
 };

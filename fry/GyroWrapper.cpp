@@ -37,6 +37,10 @@ bool QGyroWrapper::loadLatestMeasurements() {
         mpu.dmpGetQuaternion(&currentQuaternion, fifoBuffer);
         mpu.dmpGetGravity(&currentGravity, &currentQuaternion);
         mpu.dmpGetYawPitchRoll(currentYPR, &currentQuaternion, &currentGravity);
+
+        currentYaw = currentYPR[YAW_INDEX] * 180 / 3.14;
+        currentPitch = currentYPR[PITCH_INDEX] * 180 / 3.14;
+        currentRoll = currentYPR[ROLL_INDEX] * 180 / 3.14;
         return true;
     }
 
@@ -55,15 +59,15 @@ uint16_t QGyroWrapper::initialize() {
         return MPU_INIT_STATUS_MPU_ERROR;
     }
 
-    QDEBUG_BASELN("Successfully connected to the MPU");
-    while (Serial.available() && Serial.read()); // empty buffer
-    while (!Serial.available());                 // wait for data
-    while (Serial.available() && Serial.read()); // empty buffer again
-
+//    QDEBUG_BASELN("Successfully connected to the MPU");
+//    while (Serial.available() && Serial.read()); // empty buffer
+//    while (!Serial.available());                 // wait for data
+//    while (Serial.available() && Serial.read()); // empty buffer again
+//
     QDEBUG_BASELN("Initializing DNP");
     uint8_t dev_status = mpu.dmpInitialize();
 
-    // Its from the tutorial not sure what it does
+//    // Its from the tutorial not sure what it does
 //    mpu.setXGyroOffset(220);
 //    mpu.setYGyroOffset(76);
 //    mpu.setZGyroOffset(-85);

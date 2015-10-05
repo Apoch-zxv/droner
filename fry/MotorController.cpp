@@ -7,7 +7,7 @@
 const unsigned int MotorController::SERVO_ATTACH_DELAY = 100;
 const unsigned int MotorController::ESC_ARM_DELAY = 5000;
 const unsigned int MotorController::ESC_MIN = 700;
-const unsigned int MotorController::ESC_MAX = 2000;
+const unsigned int MotorController::ESC_MAX = 1400;
 
 void MotorController::init() {
     QDEBUG_BASELN("Initiating the motor controller");
@@ -15,8 +15,6 @@ void MotorController::init() {
     bserv.attach(b);
     cserv.attach(c);
     dserv.attach(d);
-
-    delay(SERVO_ATTACH_DELAY);
 
     QDEBUG_BASELN("Arming the escs 5 sec delay....");
     QDEBUG_BASELN(ESC_MIN);
@@ -31,7 +29,7 @@ void MotorController::init() {
 
 unsigned int a = 0;
 
-void MotorController::validateInRange(unsigned int* value) {
+void MotorController::validateInRange(float* value) {
     if ((*value) < minimal_speed) {
         (*value) = minimal_speed;
     }
@@ -41,10 +39,10 @@ void MotorController::validateInRange(unsigned int* value) {
 }
 
 void MotorController::updateSpeed(const float& yawAction, const float& pitchAction, const float& rollAction, unsigned int total_speed) {
-    athrottle = (int) athrottle + rollAction - yawAction + total_speed;
-    bthrottle = (int) bthrottle + pitchAction + yawAction + total_speed;
-    cthrottle = (int) cthrottle - rollAction - yawAction + total_speed;
-    dthrottle = (int) dthrottle - pitchAction + yawAction + total_speed;
+    athrottle += - pitchAction + yawAction + total_speed;
+    bthrottle += - rollAction - yawAction + total_speed;
+    cthrottle += + pitchAction + yawAction + total_speed;
+    dthrottle += + rollAction - yawAction + total_speed;
 
     validateInRange(&athrottle);
     validateInRange(&bthrottle);
@@ -52,6 +50,13 @@ void MotorController::updateSpeed(const float& yawAction, const float& pitchActi
     validateInRange(&dthrottle);
 
     setThrottle();
+}
+
+void MotorController::printThrottle() {
+    QDEBUG_BASELN(athrottle);
+    QDEBUG_BASELN(bthrottle);
+    QDEBUG_BASELN(cthrottle);
+    QDEBUG_BASELN(dthrottle);
 }
 
 void MotorController::forceStop() {
@@ -64,16 +69,8 @@ void MotorController::forceStop() {
 }
 
 void MotorController::setThrottle() {
-    /*if (a % 10000 == 0) {
-        Serial.println(athrottle);
-        Serial.println(bthrottle);
-        Serial.println(cthrottle);
-        Serial.println(dthrottle);
-    }
-    a ++;*/
-
-    aserv.write(athrottle);
-    bserv.write(bthrottle);
-    cserv.write(cthrottle);
-    dserv.write(dthrottle);
+    aserv.write((unsigned int) athrottle);
+    bserv.write((unsigned int) bthrottle);
+    cserv.write((unsigned int) cthrottle);
+    dserv.write((unsigned int) dthrottle);
 }

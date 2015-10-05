@@ -18,10 +18,15 @@ project(${PROJECT_NAME} C CXX)
 set(${PROJECT_NAME}_BOARD uno)
 
 # Define the source code
+#set(${PROJECT_NAME}_SRCS qcopter.cpp external_libraries/I2Cdev.cpp external_libraries/MPU6050.cpp GyroWrapper.cpp MotorController.cpp PIDProcess.cpp DataPersistor.cpp)
 set(${PROJECT_NAME}_SRCS qcopter.cpp external_libraries/I2Cdev.cpp external_libraries/MPU6050.cpp GyroWrapper.cpp MotorController.cpp PIDProcess.cpp)
 
 # Define the port for uploading code to the Arduino
 set(${PROJECT_NAME}_PORT /dev/ttyUSB0)
+link_directories(/home/grg/work/droner/fry/build)
 
 # Command to generate code arduino firmware (.hex file)
 generate_arduino_firmware(${PROJECT_NAME})
+
+target_link_libraries(fry libuno_Servo.a)
+

@@ -14,8 +14,8 @@
 enum InitializationStatus {MPU_INIT_STATUS_SUCCESS = 0x10, MPU_INIT_STATUS_MPU_ERROR = 0x20, MPU_INIT_STATUS_DNP_ERROR = 0x40};
 
 #define YAW_INDEX 0
-#define PITCH_INDEX 1
-#define ROLL_INDEX 2
+#define PITCH_INDEX 2
+#define ROLL_INDEX 1
 #define AXIS_NUM 3
 
 class QGyroWrapper {
@@ -24,6 +24,7 @@ private:
     Quaternion currentQuaternion;
     VectorFloat currentGravity;
     float currentYPR[AXIS_NUM];
+    float currentYaw, currentPitch, currentRoll;
 
     uint16_t packetSize;
     uint8_t lastInterruptState;
@@ -37,9 +38,9 @@ public:
     inline const uint16_t& getPacketSize() const { return packetSize; }
     inline volatile bool& getMpuInterrupt() { return MPU_INTERRUPT; }
 
-    inline const float& getCurrentYaw() const { return currentYPR[YAW_INDEX]; }
-    inline const float& getCurrentPitch() const { return currentYPR[PITCH_INDEX]; }
-    inline const float& getCurrentRoll() const { return currentYPR[ROLL_INDEX]; }
+    inline const float& getCurrentYaw() const { return currentYaw; }
+    inline const float& getCurrentPitch() const { return currentPitch; }
+    inline const float& getCurrentRoll() const { return currentRoll; }
 
     inline uint8_t* getFifoBuffer() { return fifoBuffer; }
 };

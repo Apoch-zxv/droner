@@ -5,15 +5,17 @@
 #include "PIDProcess.h"
 
 #include "Arduino.h"
+#include <string.h>
 
 const unsigned long PIDProcess::DEFAULT_SAMPLE_TIME = 100;
 
-PIDProcess::PIDProcess(float desiredValue, float ki, float kd, float kp,
+PIDProcess::PIDProcess(const char* name, float desiredValue, float ki, float kd, float kp,
                        ControllerDirections controllerDirection, float outMin, float outMax)
-        :desiredValue(desiredValue), outMin(outMin), outMax(outMax),
+        :desiredValue(desiredValue), specifiedDesiredValue(desiredValue), outMin(outMin), outMax(outMax),
          controllerDirection(controllerDirection), sampleTime(DEFAULT_SAMPLE_TIME), ITerm(0) {
     setTunings(kp, ki, kd);
 
+    strcpy(this->name, name);
     this->lastExecMillis = millis() - this->sampleTime;
 }
 
@@ -56,15 +58,7 @@ bool PIDProcess::compute(const float& currentValue) {
 }
 
 void PIDProcess::setTunings(float kp, float ki, float kd) {
-    float sampleTimeSec = ((float)sampleTime)/1000;
     this->kp = kp;
-    this->ki = ki * sampleTimeSec;
-    this->kd = kd / sampleTimeSec;
-
-    if(controllerDirection == REVERSE)
-    {
-        this->kp = (0 - this->kp);
-        this->ki = (0 - this->ki);
-        this->kd = (0 - this->kd);
-    }
+    this->ki = ki;
+    this->kd = kd;
 }
